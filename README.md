@@ -1,4 +1,4 @@
-# Site de Casamento - Lorena & Willian
+﻿# Site de Casamento - Lorena & Willian
 
 Landing page completa e personalizável para casamento, totalmente independente de plataformas externas.
 
@@ -156,3 +156,26 @@ Este projeto é livre para uso pessoal. Personalize como desejar!
 ---
 
 **Feito com ❤️ para o grande dia de Lorena & Willian**
+
+
+## Pagamento de presentes (Mercado Pago)
+
+A lista de presentes foi integrada com checkout online do Mercado Pago, com suporte a cartao de credito e PIX.
+
+### Variaveis de ambiente
+
+Configure no ambiente de deploy:
+
+- `MP_ACCESS_TOKEN`: Access Token da conta Mercado Pago.
+- `SITE_URL`: URL publica do site (ex.: `https://seusite.com`).
+
+### Endpoint criado
+
+- `POST /api/create-payment-preference`
+  - Entrada: `{ "giftName": "Nome do presente" }`
+  - Saida: URL de checkout para redirecionamento ao Mercado Pago.
+
+### Fluxo no frontend
+
+- Cada botao da lista de presentes abre o checkout do item correspondente.
+- O retorno de status ocorre via query string (`payment_status`) com mensagens para aprovado, pendente ou falha.

@@ -1,4 +1,4 @@
-// Navegação suave e funcionalidades da landing page
+﻿// Navegação suave e funcionalidades da landing page
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -300,107 +300,83 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ========== FUNCIONALIDADE DE PRESENTES ==========
+    // ========== FUNCIONALIDADE DE PRESENTES (MERCADO PAGO) ==========
     const presenteButtons = document.querySelectorAll('.btn-presente');
 
-        // Reaplicar presentes escolhidos ao carregar
-    (function restorePresentes() {
-    try {
-        const escolhidos = JSON.parse(localStorage.getItem('presentesEscolhidos')) || [];
-        if (!escolhidos.length) return;
+    (function initPresentesPayment() {
+        if (!presenteButtons.length) return;
 
-        presenteButtons.forEach(btn => {
-        const nome = btn.getAttribute('data-presente');
+        const params = new URLSearchParams(window.location.search);
+        const paymentStatus = params.get('payment_status');
+        const giftName = params.get('gift');
 
-        if (escolhidos.includes(nome)) {
-            btn.disabled = true;
-            btn.textContent = 'Escolhido!';
-            btn.style.backgroundColor = '#28a745';
+        if (paymentStatus) {
+            const statusMessage = {
+                approved: 'Pagamento aprovado! Muito obrigado pelo presente e carinho. ❤',
+                pending: 'Pagamento pendente. Assim que for confirmado, ele aparecera no Mercado Pago.',
+                failure: 'Pagamento nao concluido. Voce pode tentar novamente a qualquer momento.'
+            };
 
-            const card = btn.closest('.presente-card');
-            if (card && !card.querySelector('.confirmacao')) {
-            const confirmacao = document.createElement('div');
-            confirmacao.className = 'confirmacao';
-            confirmacao.innerHTML = `
-                <p><strong>Obrigado!</strong></p>
-                <p>Você escolheu: <strong>${nome}</strong></p>
-                <p>Agradecemos muito pelo carinho! ❤️</p>
-            `;
-            card.appendChild(confirmacao);
-            }
+            const message = statusMessage[paymentStatus] || 'Status de pagamento recebido.';
+            alert(giftName ? `${message}\n\nPresente: ${giftName}` : message);
+
+            params.delete('payment_status');
+            params.delete('gift');
+            const cleanQuery = params.toString();
+            const cleanUrl = `${window.location.pathname}${cleanQuery ? `?${cleanQuery}` : ''}${window.location.hash}`;
+            window.history.replaceState({}, document.title, cleanUrl);
         }
-        });
-    } catch (e) {
-        console.log('Falha ao restaurar presentes:', e);
-    }
-    })();
 
-    presenteButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const presenteNome = this.getAttribute('data-presente');
-            const presenteCard = this.closest('.presente-card');
-            
-            // Verificar se já foi escolhido
-            if (this.disabled) {
-                if (presenteNome === 'Pix') {
-                    showPixInfo();
-                }
-                return;
-            }
-            
-            // Confirmar escolha
-            const confirmar = confirm(`Você deseja escolher o presente: ${presenteNome}?`);
-            
-            if (confirmar) {
-                // Desabilitar botão
+        presenteButtons.forEach(button => {
+            button.textContent = 'Pagar com Pix ou Cartao';
+
+            button.addEventListener('click', async function() {
+                const presenteNome = this.getAttribute('data-presente');
+                if (!presenteNome) return;
+
+                const confirmar = confirm(
+                    `Voce sera redirecionado(a) ao Mercado Pago para pagar "${presenteNome}" com Pix ou cartao. Deseja continuar?`
+                );
+
+                if (!confirmar) return;
+
+                const originalText = this.textContent;
                 this.disabled = true;
-                this.textContent = 'Escolhido!';
-                this.style.backgroundColor = '#28a745';
-                
-                // Adicionar mensagem de confirmação
-                const confirmacao = document.createElement('div');
-                confirmacao.className = 'confirmacao';
-                confirmacao.innerHTML = `
-                    <p><strong>Obrigado!</strong></p>
-                    <p>Você escolheu: <strong>${presenteNome}</strong></p>
-                    <p>Agradecemos muito pelo carinho! ❤️</p>
-                `;
-                presenteCard.appendChild(confirmacao);
-                
-                // Salvar escolha no localStorage
-                savePresenteToLocalStorage(presenteNome);
-                
-                // Se for PIX, mostrar informações
-                if (presenteNome === 'Pix') {
-                    setTimeout(() => {
-                        showPixInfo();
-                    }, 1000);
+                this.textContent = 'Gerando pagamento...';
+
+                try {
+                    const response = await fetch('/api/create-payment-preference', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            giftName: presenteNome,
+                            origin: window.location.origin,
+                            siteUrl: window.location.origin
+                        })
+                    });
+
+                    const result = await response.json().catch(() => ({}));
+
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Nao foi possivel iniciar o pagamento.');
+                    }
+
+                    const checkoutUrl = result.checkoutUrl || result.sandboxCheckoutUrl;
+                    if (!checkoutUrl) {
+                        throw new Error('Link de pagamento indisponivel.');
+                    }
+
+                    window.location.href = checkoutUrl;
+                } catch (error) {
+                    alert(error.message || 'Erro ao iniciar pagamento. Tente novamente.');
+                    this.disabled = false;
+                    this.textContent = originalText;
                 }
-            }
+            });
         });
-    });
-    
-    function showPixInfo() {
-        const pixInfo = `
-            Chave PIX: casamento@lorenaewillian.com.br\n
-            Ou escaneie o QR Code abaixo (adicione uma imagem do QR Code)\n\n
-            Obrigado pela contribuição! ❤️
-        `;
-        alert(pixInfo);
-    }
-    
-    function savePresenteToLocalStorage(presenteNome) {
-        try {
-            let presentesEscolhidos = JSON.parse(localStorage.getItem('presentesEscolhidos')) || [];
-            if (!presentesEscolhidos.includes(presenteNome)) {
-                presentesEscolhidos.push(presenteNome);
-                localStorage.setItem('presentesEscolhidos', JSON.stringify(presentesEscolhidos));
-            }
-        } catch (e) {
-            console.log('Não foi possível salvar no localStorage:', e);
-        }
-    }
-    
+    })();
     // ========== ANIMAÇÃO DE ELEMENTOS AO SCROLL ==========
     const observerOptions = {
         threshold: 0.1,
@@ -492,4 +468,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('🎉 Site de casamento carregado com sucesso!');
 });
+
+
 

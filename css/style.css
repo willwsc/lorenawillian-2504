@@ -1020,6 +1020,65 @@ nav ul li a:hover {
     text-align: center;
 }
 
+/* ===== PRESENTES com cards no estilo "O Grande Dia" ===== */
+#presentes .presente-card{
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(212,165,116,0.55);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  transition: var(--transition);
+}
+
+#presentes .presente-card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+  border-color: rgba(212,165,116,0.75);
+}
+
+#presentes .presente-card::before{
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.32),
+    rgba(255,255,255,0.06),
+    rgba(255,255,255,0.0)
+  );
+  transform: rotate(15deg);
+  pointer-events: none;
+}
+
+#presentes .presente-card{
+  position: relative;
+}
+
+#presentes .presente-card h3{
+  color: var(--primary-color);
+}
+
+#presentes .presente-descricao{
+  color: rgba(255,255,255,0.85);
+}
+
+#presentes .presente-valor{
+  color: rgba(255,255,255,0.88);
+}
+
+#presentes .presente-image{
+  background: rgba(0,0,0,0.18);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+#presentes .image-placeholder-presente{
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+}
 /* Footer */
 .footer {
     background-color: var(--text-dark);
@@ -1615,5 +1674,6 @@ nav ul li a:hover {
     background-position: center 22%;
   }
 }
+
 
 

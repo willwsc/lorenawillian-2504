@@ -1,24 +1,39 @@
-﻿const { kv } = require('@vercel/kv');
+﻿const { getRedisClient } = require('./redis-client');
 
 const PAID_GIFTS_KEY = 'gifts:paid';
 
-async function getPaidGifts() {
-  const stored = await kv.get(PAID_GIFTS_KEY);
-  if (!Array.isArray(stored)) {
+function sanitizePaidList(values) {
+  if (!Array.isArray(values)) {
     return [];
   }
 
-  return stored.filter(item => typeof item === 'string');
+  return values.filter((item) => typeof item === 'string');
 }
 
-async function markGiftAsPaid(giftName) {
+async function getPaidGifts() {
+  const redis = await getRedisClient();
+  const raw = await redis.get(PAID_GIFTS_KEY);
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return sanitizePaidList(parsed);
+  } catch (error) {
+    return [];
+  }
+}
+
+async function markGiftAsPaid(giftId) {
   const current = await getPaidGifts();
-  if (current.includes(giftName)) {
+  if (current.includes(giftId)) {
     return current;
   }
 
-  const updated = [...current, giftName];
-  await kv.set(PAID_GIFTS_KEY, updated);
+  const updated = [...current, giftId];
+  const redis = await getRedisClient();
+  await redis.set(PAID_GIFTS_KEY, JSON.stringify(updated));
   return updated;
 }
 

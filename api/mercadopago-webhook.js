@@ -1,6 +1,7 @@
 ﻿const { MercadoPagoConfig, Payment } = require('mercadopago');
 const { isValidGiftName } = require('./_lib/gift-catalog');
 const { markGiftAsPaid } = require('./_lib/gifts-store');
+const { hasRedisConfig } = require('./_lib/redis-client');
 
 function extractPaymentId(req) {
   return (
@@ -23,8 +24,8 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-    res.status(500).json({ ok: false, error: 'Vercel KV not configured.' });
+  if (!hasRedisConfig()) {
+    res.status(500).json({ ok: false, error: 'Redis not configured.' });
     return;
   }
 
@@ -57,3 +58,4 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ ok: false, error: 'Falha ao processar webhook do Mercado Pago.' });
   }
 };
+

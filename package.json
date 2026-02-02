@@ -12,6 +12,6 @@
                          "live-server":  "^1.2.2",
                          "resend":  "^4.0.0",
                          "mercadopago":  "^2.6.4",
-                         "@vercel/kv":  "^2.0.0"
+                         "redis":  "^4.7.0"
                      }
 }

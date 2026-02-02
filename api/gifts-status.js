@@ -1,4 +1,5 @@
-﻿const { getPaidGifts } = require('./_lib/gifts-store');
+﻿const { hasRedisConfig } = require('./_lib/redis-client');
+const { getPaidGifts } = require('./_lib/gifts-store');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -6,8 +7,8 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-    res.status(500).json({ ok: false, error: 'Vercel KV not configured.' });
+  if (!hasRedisConfig()) {
+    res.status(500).json({ ok: false, error: 'Redis not configured.' });
     return;
   }
 
@@ -18,3 +19,4 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ ok: false, error: 'Falha ao obter status dos presentes.' });
   }
 };
+

@@ -183,14 +183,17 @@ Configure no ambiente de deploy:
 
 ### Persistencia real de presentes pagos
 
-Para gravar compras globalmente (visivel para todos os visitantes), configure o Vercel KV e o webhook do Mercado Pago:
+Para gravar compras globalmente (visivel para todos os visitantes), configure Redis Cloud e o webhook do Mercado Pago.
 
-- `KV_REST_API_URL`
-- `KV_REST_API_TOKEN`
+Voce pode configurar de duas formas:
+
+- `REDIS_URL` (formato completo de conexao), ou
+- `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD` (opcional: `REDIS_USERNAME`, `REDIS_TLS=true`).
 
 Com isso:
 
 - `POST /api/mercadopago-webhook` recebe notificacoes de pagamento aprovado.
 - `GET /api/gifts-status` retorna a lista de presentes ja pagos.
 
-No Vercel, crie um banco KV em **Storage > KV** e conecte ao projeto para injetar as variaveis automaticamente.
+No Vercel, adicione essas variaveis em **Project Settings > Environment Variables**.
+

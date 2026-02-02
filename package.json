@@ -1,17 +1,17 @@
 {
-    "name":  "projetocasamento",
-    "version":  "1.0.0",
-    "private":  true,
-    "description":  "Site do casamento",
-    "main":  "index.html",
-    "scripts":  {
-                    "dev":  "live-server",
-                    "start":  "live-server"
-                },
-    "dependencies":  {
-                         "live-server":  "^1.2.2",
-                         "resend":  "^4.0.0",
-                         "mercadopago":  "^2.6.4",
-                         "redis":  "^4.7.0"
-                     }
+    "name": "projetocasamento",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Site do casamento",
+    "main": "index.html",
+    "scripts": {
+        "dev": "live-server",
+        "start": "live-server"
+    },
+    "dependencies": {
+        "live-server": "^1.2.2",
+        "mercadopago": "^2.6.4",
+        "redis": "^4.7.1",
+        "resend": "^4.0.0"
+    }
 }

@@ -306,6 +306,49 @@ document.addEventListener('DOMContentLoaded', function() {
     (function initPresentesPayment() {
         if (!presenteButtons.length) return;
 
+        const STORAGE_KEY = 'presentesPagos';
+
+        function getPresentesPagos() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function savePresentePago(nomePresente) {
+            const pagos = getPresentesPagos();
+            if (!pagos.includes(nomePresente)) {
+                pagos.push(nomePresente);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(pagos));
+            }
+        }
+
+        function marcarPresenteComoPago(nomePresente) {
+            const button = Array.from(presenteButtons).find(
+                btn => btn.getAttribute('data-presente') === nomePresente
+            );
+            if (!button) return;
+
+            button.disabled = true;
+            button.textContent = 'Pago com sucesso!';
+            button.style.backgroundColor = '#28a745';
+
+            const card = button.closest('.presente-card');
+            if (!card || card.querySelector('.confirmacao')) return;
+
+            const confirmacao = document.createElement('div');
+            confirmacao.className = 'confirmacao';
+            confirmacao.innerHTML = `
+                <p><strong>Obrigado!</strong></p>
+                <p>Presente confirmado: <strong>${nomePresente}</strong></p>
+                <p>Pagamento aprovado com sucesso.</p>
+            `;
+            card.appendChild(confirmacao);
+        }
+
+        getPresentesPagos().forEach(marcarPresenteComoPago);
+
         const params = new URLSearchParams(window.location.search);
         const paymentStatus = params.get('payment_status');
         const giftName = params.get('gift');
@@ -320,6 +363,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const message = statusMessage[paymentStatus] || 'Status de pagamento recebido.';
             alert(giftName ? `${message}\n\nPresente: ${giftName}` : message);
 
+            if (paymentStatus === 'approved' && giftName) {
+                savePresentePago(giftName);
+                marcarPresenteComoPago(giftName);
+            }
+
             params.delete('payment_status');
             params.delete('gift');
             const cleanQuery = params.toString();
@@ -328,7 +376,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         presenteButtons.forEach(button => {
-            button.textContent = 'Pagar com Pix ou Cartao';
+            if (!button.disabled) {
+                button.textContent = 'Pagar com Pix ou Cartao';
+            }
 
             button.addEventListener('click', async function() {
                 const presenteNome = this.getAttribute('data-presente');
@@ -468,6 +518,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('🎉 Site de casamento carregado com sucesso!');
 });
+
+
+
 
 
 

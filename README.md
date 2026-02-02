@@ -179,3 +179,18 @@ Configure no ambiente de deploy:
 
 - Cada botao da lista de presentes abre o checkout do item correspondente.
 - O retorno de status ocorre via query string (`payment_status`) com mensagens para aprovado, pendente ou falha.
+
+
+### Persistencia real de presentes pagos
+
+Para gravar compras globalmente (visivel para todos os visitantes), configure o Vercel KV e o webhook do Mercado Pago:
+
+- `KV_REST_API_URL`
+- `KV_REST_API_TOKEN`
+
+Com isso:
+
+- `POST /api/mercadopago-webhook` recebe notificacoes de pagamento aprovado.
+- `GET /api/gifts-status` retorna a lista de presentes ja pagos.
+
+No Vercel, crie um banco KV em **Storage > KV** e conecte ao projeto para injetar as variaveis automaticamente.

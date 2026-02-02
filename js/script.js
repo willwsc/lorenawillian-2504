@@ -306,29 +306,21 @@ document.addEventListener('DOMContentLoaded', function() {
     (function initPresentesPayment() {
         if (!presenteButtons.length) return;
 
-        const STORAGE_KEY = 'presentesPagos';
-
-        function getPresentesPagos() {
-            try {
-                return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            } catch (error) {
-                return [];
-            }
-        }
-
-        function savePresentePago(nomePresente) {
-            const pagos = getPresentesPagos();
-            if (!pagos.includes(nomePresente)) {
-                pagos.push(nomePresente);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(pagos));
-            }
-        }
-
-        function marcarPresenteComoPago(nomePresente) {
-            const button = Array.from(presenteButtons).find(
-                btn => btn.getAttribute('data-presente') === nomePresente
+        function getButtonByGiftId(giftId) {
+            return Array.from(presenteButtons).find(
+                btn => btn.getAttribute('data-presente') === giftId
             );
+        }
+
+        function getGiftLabel(button, fallback) {
+            return button?.getAttribute('data-presente-label') || fallback;
+        }
+
+        function marcarPresenteComoPago(giftId) {
+            const button = getButtonByGiftId(giftId);
             if (!button) return;
+
+            const giftLabel = getGiftLabel(button, giftId);
 
             button.disabled = true;
             button.textContent = 'Pago com sucesso!';
@@ -341,17 +333,29 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmacao.className = 'confirmacao';
             confirmacao.innerHTML = `
                 <p><strong>Obrigado!</strong></p>
-                <p>Presente confirmado: <strong>${nomePresente}</strong></p>
+                <p>Presente confirmado: <strong>${giftLabel}</strong></p>
                 <p>Pagamento aprovado com sucesso.</p>
             `;
             card.appendChild(confirmacao);
         }
 
-        getPresentesPagos().forEach(marcarPresenteComoPago);
+        async function carregarPresentesPagos() {
+            try {
+                const response = await fetch('/api/gifts-status');
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok || !Array.isArray(result.paidGifts)) {
+                    return;
+                }
+
+                result.paidGifts.forEach(marcarPresenteComoPago);
+            } catch (error) {
+                console.log('Nao foi possivel carregar status dos presentes:', error);
+            }
+        }
 
         const params = new URLSearchParams(window.location.search);
         const paymentStatus = params.get('payment_status');
-        const giftName = params.get('gift');
+        const giftId = params.get('gift');
 
         if (paymentStatus) {
             const statusMessage = {
@@ -360,12 +364,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 failure: 'Pagamento nao concluido. Voce pode tentar novamente a qualquer momento.'
             };
 
-            const message = statusMessage[paymentStatus] || 'Status de pagamento recebido.';
-            alert(giftName ? `${message}\n\nPresente: ${giftName}` : message);
+            const giftButton = giftId ? getButtonByGiftId(giftId) : null;
+            const giftLabel = giftButton ? getGiftLabel(giftButton, giftId) : giftId;
 
-            if (paymentStatus === 'approved' && giftName) {
-                savePresentePago(giftName);
-                marcarPresenteComoPago(giftName);
+            const message = statusMessage[paymentStatus] || 'Status de pagamento recebido.';
+            alert(giftLabel ? `${message}\n\nPresente: ${giftLabel}` : message);
+
+            if (paymentStatus === 'approved' && giftId) {
+                marcarPresenteComoPago(giftId);
             }
 
             params.delete('payment_status');
@@ -381,11 +387,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             button.addEventListener('click', async function() {
-                const presenteNome = this.getAttribute('data-presente');
-                if (!presenteNome) return;
+                const giftId = this.getAttribute('data-presente');
+                const giftLabel = getGiftLabel(this, giftId);
+
+                if (!giftId) return;
 
                 const confirmar = confirm(
-                    `Voce sera redirecionado(a) ao Mercado Pago para pagar "${presenteNome}" com Pix ou cartao. Deseja continuar?`
+                    `Voce sera redirecionado(a) ao Mercado Pago para pagar "${giftLabel}" com Pix ou cartao. Deseja continuar?`
                 );
 
                 if (!confirmar) return;
@@ -401,7 +409,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            giftName: presenteNome,
+                            giftName: giftId,
+                            giftLabel,
                             origin: window.location.origin,
                             siteUrl: window.location.origin
                         })
@@ -426,6 +435,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+
+        carregarPresentesPagos();
     })();
     // ========== ANIMAÇÃO DE ELEMENTOS AO SCROLL ==========
     const observerOptions = {
@@ -518,6 +529,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('🎉 Site de casamento carregado com sucesso!');
 });
+
+
 
 
 

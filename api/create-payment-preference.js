@@ -1,27 +1,5 @@
 ﻿const { MercadoPagoConfig, Preference } = require('mercadopago');
-
-const GIFT_CATALOG = {
-  'Unha da noiva': 250,
-  'Make da noiva': 280,
-  'Vaquinha dos noivos': 1900,
-  'Relógio do noivo': 350,
-  'Decoração do cantinho': 1300,
-  'Jogo de cama premium': 900,
-  'Vida real dos noivos': 2500,
-  'Kit sobrevivência': 600,
-  'Amigos para sempre': 420,
-  'Cabelo do noivo': 1700,
-  'Potes da geladeira': 250,
-  'Skincare de clínica': 450,
-  'Taxa da paciência': 3000,
-  'Primeira rodada': 500,
-  'Roupa de cama premium': 800,
-  'Mobiliar a casa': 1100,
-  'Kit emergência': 320,
-  'Relógio de respeito': 2000,
-  'Primeira compra': 650,
-  'Camisa do Santos': 550,
-};
+const { isValidGiftName, getGiftById } = require('./_lib/gift-catalog');
 
 function parseRequestBody(req) {
   if (!req.body) return {};
@@ -79,14 +57,14 @@ module.exports = async function handler(req, res) {
   }
 
   const body = parseRequestBody(req);
-  const giftName = body.giftName ? String(body.giftName).trim() : '';
+  const giftId = body.giftName ? String(body.giftName).trim() : '';
 
-  if (!giftName || !Object.prototype.hasOwnProperty.call(GIFT_CATALOG, giftName)) {
+  if (!giftId || !isValidGiftName(giftId)) {
     res.status(400).json({ ok: false, error: 'Invalid gift name.' });
     return;
   }
 
-  const amount = GIFT_CATALOG[giftName];
+  const gift = getGiftById(giftId);
   const baseUrl = getBaseUrl(req, body);
 
   if (!baseUrl) {
@@ -94,10 +72,11 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const encodedGift = encodeURIComponent(giftName);
+  const encodedGift = encodeURIComponent(giftId);
   const successUrl = `${baseUrl}/?payment_status=approved&gift=${encodedGift}`;
   const pendingUrl = `${baseUrl}/?payment_status=pending&gift=${encodedGift}`;
   const failureUrl = `${baseUrl}/?payment_status=failure&gift=${encodedGift}`;
+  const notificationUrl = `${baseUrl}/api/mercadopago-webhook`;
 
   try {
     const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
@@ -107,12 +86,12 @@ module.exports = async function handler(req, res) {
       body: {
         items: [
           {
-            id: giftName,
-            title: giftName,
-            description: `Presente de casamento: ${giftName}`,
+            id: giftId,
+            title: gift.label,
+            description: `Presente de casamento: ${gift.label}`,
             quantity: 1,
             currency_id: 'BRL',
-            unit_price: amount,
+            unit_price: gift.amount,
           },
         ],
         payment_methods: {
@@ -124,8 +103,9 @@ module.exports = async function handler(req, res) {
           pending: pendingUrl,
           failure: failureUrl,
         },
+        notification_url: notificationUrl,
         auto_return: 'approved',
-        external_reference: giftName,
+        external_reference: giftId,
         statement_descriptor: 'CASAMENTO LW',
       },
     });

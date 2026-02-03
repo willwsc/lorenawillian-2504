@@ -953,10 +953,13 @@ nav ul li a:hover {
     box-shadow: var(--shadow-hover);
 }
 
-.presente-image {
+
+
+.presente-image img {
     width: 100%;
-    height: 200px;
-    overflow: hidden;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .image-placeholder-presente {
@@ -1733,6 +1736,8 @@ nav ul li a:hover {
     background-position: center 22%;
   }
 }
+
+
 
 
 

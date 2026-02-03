@@ -316,6 +316,54 @@ document.addEventListener('DOMContentLoaded', function() {
             return button?.getAttribute('data-presente-label') || fallback;
         }
 
+        function applyMassGiftImages() {
+            const extensions = ['webp', 'jpg', 'jpeg', 'png'];
+
+            function loadByExtension(imgElement, giftId, extIndex, onSuccess, onFail) {
+                if (extIndex >= extensions.length) {
+                    onFail();
+                    return;
+                }
+
+                const extension = extensions[extIndex];
+                imgElement.onload = onSuccess;
+                imgElement.onerror = function handleImageError() {
+                    loadByExtension(imgElement, giftId, extIndex + 1, onSuccess, onFail);
+                };
+                imgElement.src = `images/presentes/${giftId}.${extension}`;
+            }
+
+            presenteButtons.forEach((button) => {
+                const giftId = button.getAttribute('data-presente');
+                if (!giftId) return;
+
+                const imageContainer = button.closest('.presente-card')?.querySelector('.presente-image');
+                const placeholder = imageContainer?.querySelector('.image-placeholder-presente');
+
+                if (!imageContainer || !placeholder || imageContainer.querySelector('img')) {
+                    return;
+                }
+
+                const giftLabel = getGiftLabel(button, giftId);
+                const image = document.createElement('img');
+                image.loading = 'lazy';
+                image.alt = giftLabel;
+
+                loadByExtension(
+                    image,
+                    giftId,
+                    0,
+                    () => {
+                        placeholder.remove();
+                        imageContainer.appendChild(image);
+                    },
+                    () => {
+                        image.remove();
+                    }
+                );
+            });
+        }
+
         function marcarPresenteComoPago(giftId) {
             const button = getButtonByGiftId(giftId);
             if (!button) return;
@@ -436,6 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
+        applyMassGiftImages();
         carregarPresentesPagos();
     })();
     // ========== ANIMAÇÃO DE ELEMENTOS AO SCROLL ==========
@@ -529,6 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('🎉 Site de casamento carregado com sucesso!');
 });
+
 
 
 

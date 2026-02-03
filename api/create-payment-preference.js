@@ -96,7 +96,6 @@ module.exports = async function handler(req, res) {
         ],
         payment_methods: {
           installments: 12,
-          excluded_payment_types: [{ id: 'ticket' }, { id: 'atm' }],
         },
         back_urls: {
           success: successUrl,
@@ -124,3 +123,4 @@ module.exports = async function handler(req, res) {
     });
   }
 };
+

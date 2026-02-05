@@ -371,20 +371,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const giftLabel = getGiftLabel(button, giftId);
 
             button.disabled = true;
-            button.textContent = 'Pago com sucesso!';
-            button.style.backgroundColor = '#28a745';
-
-            const card = button.closest('.presente-card');
-            if (!card || card.querySelector('.confirmacao')) return;
-
-            const confirmacao = document.createElement('div');
-            confirmacao.className = 'confirmacao';
-            confirmacao.innerHTML = `
-                <p><strong>Obrigado!</strong></p>
-                <p>Presente confirmado: <strong>${giftLabel}</strong></p>
-                <p>Pagamento aprovado com sucesso.</p>
-            `;
-            card.appendChild(confirmacao);
+            button.textContent = '';
+            button.style.display = 'none';
         }
 
         async function carregarPresentesPagos() {
@@ -578,6 +566,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('🎉 Site de casamento carregado com sucesso!');
 });
+
+
+
 
 
 

@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const presentearHtml =
-            'Presenteie com Pix, Cartão de Crédito,<br>ou Linha de Crédito (Melhor opção)';
+            'Presenteie com Pix,<br>Cartão de Crédito, ou<br>Linha de crédito (Melhor opção)';
 
         presenteButtons.forEach(button => {
             if (!button.disabled) {

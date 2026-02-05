@@ -423,9 +423,12 @@ document.addEventListener('DOMContentLoaded', function() {
             window.history.replaceState({}, document.title, cleanUrl);
         }
 
+        const presentearHtml =
+            'Presenteie com Pix, Cartão de Crédito,<br>ou Linha de Crédito (Melhor opção)';
+
         presenteButtons.forEach(button => {
             if (!button.disabled) {
-                button.textContent = 'Presenteie com Pix, Cartão de Crédito, ou Linha de Crédito (Melhor opção)';
+                button.innerHTML = presentearHtml;
             }
 
             button.addEventListener('click', async function() {
@@ -440,7 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (!confirmar) return;
 
-                const originalText = this.textContent;
+                const originalHtml = this.innerHTML;
                 this.disabled = true;
                 this.textContent = 'Gerando pagamento...';
 
@@ -473,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } catch (error) {
                     alert(error.message || 'Erro ao iniciar pagamento. Tente novamente.');
                     this.disabled = false;
-                    this.textContent = originalText;
+                    this.innerHTML = originalHtml;
                 }
             });
         });

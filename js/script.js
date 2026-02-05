@@ -369,13 +369,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!button) return;
 
             const giftLabel = getGiftLabel(button, giftId);
-
-            button.disabled = true;
-            button.textContent = 'Pago com sucesso!';
-            button.style.display = '';
-            button.style.backgroundColor = '#28a745';
-
             const card = button.closest('.presente-card');
+            button.remove();
             if (!card || card.querySelector('.confirmacao')) return;
 
             const confirmacao = document.createElement('div');
@@ -430,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         presenteButtons.forEach(button => {
             if (!button.disabled) {
-                button.textContent = 'Pagar com Pix ou Cartao';
+                button.textContent = 'Presentear';
             }
 
             button.addEventListener('click', async function() {

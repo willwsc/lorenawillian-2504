@@ -15,7 +15,6 @@
   gift_14: { label: 'Camisa do Santos pro noivo ir ver o Neymar', amount: 450 },
   gift_15: { label: 'Comprar roupa de cama premium porque a noiva AMA dormir até tarde', amount: 420 },
   gift_16: { label: 'Ajudar a mobiliar a casa', amount: 1100 },
-  gift_17: { label: 'Camisa do Santos pro noivo ir ver o Neymar', amount: 450 },
   gift_18: { label: 'Para o noivo comprar um relógio de respeito e nunca mais se atrasar (sonho)', amount: 1200 },
   gift_19: { label: 'Primeira compra do mercado como casados', amount: 700 },
   gift_20: { label: 'Almoço Especial para os pombinhos', amount: 380 },

@@ -371,8 +371,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const giftLabel = getGiftLabel(button, giftId);
 
             button.disabled = true;
-            button.textContent = '';
-            button.style.display = 'none';
+            button.textContent = 'Pago com sucesso!';
+            button.style.display = '';
+            button.style.backgroundColor = '#28a745';
+
+            const card = button.closest('.presente-card');
+            if (!card || card.querySelector('.confirmacao')) return;
+
+            const confirmacao = document.createElement('div');
+            confirmacao.className = 'confirmacao';
+            confirmacao.innerHTML = `
+                <p>Presente recebido pelos noivos: <strong>${giftLabel}</strong></p>
+            `;
+            card.appendChild(confirmacao);
         }
 
         async function carregarPresentesPagos() {
@@ -566,6 +577,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('🎉 Site de casamento carregado com sucesso!');
 });
+
+
+
 
 
 

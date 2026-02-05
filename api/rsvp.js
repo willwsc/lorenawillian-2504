@@ -22,7 +22,7 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const { nome, email, telefone, presenca, acompanhantes, mensagem } = body || {};
+  const { nome, email, telefone, presenca, acompanhantes, membrosFamilia, mensagem } = body || {};
   if (!nome || !email || !presenca) {
     res.status(400).json({ ok: false, error: 'Missing required fields.' });
     return;
@@ -32,6 +32,20 @@ module.exports = async function handler(req, res) {
     acompanhantes === undefined || acompanhantes === null || String(acompanhantes).trim() === ''
       ? '0'
       : String(acompanhantes);
+  const membrosFamiliaTrim =
+    membrosFamilia === undefined || membrosFamilia === null ? '' : String(membrosFamilia).trim();
+  const membrosFamiliaValue = membrosFamiliaTrim || '-';
+  const acompanhantesCount = Number.parseInt(acompanhantesValue, 10);
+  const hasAcompanhantes =
+    Number.isFinite(acompanhantesCount) && acompanhantesCount > 0;
+
+  if (hasAcompanhantes && !membrosFamiliaTrim) {
+    res.status(400).json({
+      ok: false,
+      error: 'Membros da familia sao obrigatorios quando ha acompanhantes.',
+    });
+    return;
+  }
 
   const text = [
     'Nova confirmacao de presenca',
@@ -40,6 +54,7 @@ module.exports = async function handler(req, res) {
     `Telefone: ${telefone || '-'}`,
     `Presenca: ${presenca}`,
     `Acompanhantes: ${acompanhantesValue}`,
+    `Membros da familia: ${membrosFamiliaValue}`,
     `Mensagem: ${mensagem || '-'}`,
   ].join('\n');
 

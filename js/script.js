@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         presenteButtons.forEach(button => {
             if (!button.disabled) {
-                button.textContent = 'Presentear';
+                button.textContent = 'Presenteie com Pix, Cartão de Crédito, ou Linha de Crédito (Melhor opção)';
             }
 
             button.addEventListener('click', async function() {

@@ -42,7 +42,7 @@ module.exports = async function handler(req, res) {
   if (hasAcompanhantes && !membrosFamiliaTrim) {
     res.status(400).json({
       ok: false,
-      error: 'Membros da familia sao obrigatorios quando ha acompanhantes.',
+      error: 'Nome de acompanhante é obrigatório',
     });
     return;
   }

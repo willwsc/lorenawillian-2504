@@ -205,7 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json().catch(() => ({}));
 
                 if (!response.ok) {
-                    throw new Error(result.error || 'Falha ao enviar.');
+                    showMessage(result.error || 'Nao foi possivel enviar agora. Tente novamente.', 'error');
+                    return;
                 }
 
                 showMessage('Obrigado pela confirmacao! Sua presenca e muito importante para nos.', 'success');

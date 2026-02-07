@@ -1,6 +1,8 @@
 ﻿const { MercadoPagoConfig, Preference } = require('mercadopago');
 const { isValidGiftName, getGiftById } = require('./_lib/gift-catalog');
 const { Resend } = require('resend');
+const fs = require('fs/promises');
+const path = require('path');
 const { createGiftIntent } = require('./_lib/gift-intents-store');
 const { hasRedisConfig } = require('./_lib/redis-client');
 
@@ -46,6 +48,42 @@ function getBaseUrl(req, body) {
   const protocol = forwardedProto || (String(host).includes('localhost') ? 'http' : 'https');
 
   return `${protocol}://${host}`;
+}
+
+function csvEscape(value) {
+  const text = value === undefined || value === null ? '' : String(value);
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+async function appendGiftIntentCsv(intent) {
+  const dir = path.join(process.cwd(), 'api', '_data');
+  const filePath = path.join(dir, 'gift-intents.csv');
+  await fs.mkdir(dir, { recursive: true });
+
+  let needsHeader = false;
+  try {
+    await fs.access(filePath);
+  } catch (error) {
+    needsHeader = true;
+  }
+
+  const header =
+    'created_at,intent_id,gift_id,gift_label,giver_name,giver_email,gift_message,status\n';
+  const line = [
+    intent.createdAt,
+    intent.id,
+    intent.giftId,
+    intent.giftLabel,
+    intent.giverName,
+    intent.giverEmail,
+    intent.giftMessage,
+    intent.status,
+  ]
+    .map(csvEscape)
+    .join(',') + '\n';
+
+  const payload = (needsHeader ? header : '') + line;
+  await fs.appendFile(filePath, payload, 'utf8');
 }
 
 module.exports = async function handler(req, res) {
@@ -111,6 +149,11 @@ module.exports = async function handler(req, res) {
       giverEmail,
       giftMessage,
     });
+    try {
+      await appendGiftIntentCsv(intent);
+    } catch (error) {
+      console.error('Falha ao salvar backup CSV do presente:', error.message || error);
+    }
 
     const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
     const preference = new Preference(client);

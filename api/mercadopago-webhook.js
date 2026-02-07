@@ -1,6 +1,7 @@
 ﻿const { MercadoPagoConfig, Payment } = require('mercadopago');
 const { isValidGiftName } = require('./_lib/gift-catalog');
 const { markGiftAsPaid } = require('./_lib/gifts-store');
+const { markGiftIntentPaid } = require('./_lib/gift-intents-store');
 const { hasRedisConfig } = require('./_lib/redis-client');
 
 function extractPaymentId(req) {
@@ -45,15 +46,17 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const giftName = String(payment.external_reference || '').trim();
+    const reference = String(payment.external_reference || '').trim();
+    const [giftName, intentId] = reference.split('|');
     if (!giftName || !isValidGiftName(giftName)) {
       res.status(200).json({ ok: true, ignored: true, reason: 'invalid_gift_reference' });
       return;
     }
 
     await markGiftAsPaid(giftName);
+    await markGiftIntentPaid(intentId, paymentId);
 
-    res.status(200).json({ ok: true, giftName, paymentId: String(paymentId) });
+    res.status(200).json({ ok: true, giftName, paymentId: String(paymentId), intentId: intentId || null });
   } catch (error) {
     res.status(500).json({ ok: false, error: 'Falha ao processar webhook do Mercado Pago.' });
   }

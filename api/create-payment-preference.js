@@ -1,5 +1,8 @@
 ﻿const { MercadoPagoConfig, Preference } = require('mercadopago');
 const { isValidGiftName, getGiftById } = require('./_lib/gift-catalog');
+const { Resend } = require('resend');
+const { createGiftIntent } = require('./_lib/gift-intents-store');
+const { hasRedisConfig } = require('./_lib/redis-client');
 
 function parseRequestBody(req) {
   if (!req.body) return {};
@@ -56,11 +59,33 @@ module.exports = async function handler(req, res) {
     return;
   }
 
+  if (!hasRedisConfig()) {
+    res.status(500).json({ ok: false, error: 'Redis not configured.' });
+    return;
+  }
+
   const body = parseRequestBody(req);
   const giftId = body.giftName ? String(body.giftName).trim() : '';
+  const giverName = body.giverName ? String(body.giverName).trim() : '';
+  const giverEmail = body.giverEmail ? String(body.giverEmail).trim() : '';
+  const giftMessage = body.giftMessage ? String(body.giftMessage).trim() : '';
 
   if (!giftId || !isValidGiftName(giftId)) {
     res.status(400).json({ ok: false, error: 'Invalid gift name.' });
+    return;
+  }
+
+  if (!giverName || !giverEmail || !giftMessage) {
+    res.status(400).json({
+      ok: false,
+      error: 'Nome, e-mail e bilhetinho sao obrigatorios.',
+    });
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(giverEmail)) {
+    res.status(400).json({ ok: false, error: 'E-mail invalido.' });
     return;
   }
 
@@ -79,8 +104,17 @@ module.exports = async function handler(req, res) {
   const notificationUrl = `${baseUrl}/api/mercadopago-webhook`;
 
   try {
+    const intent = await createGiftIntent({
+      giftId,
+      giftLabel: gift.label,
+      giverName,
+      giverEmail,
+      giftMessage,
+    });
+
     const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
     const preference = new Preference(client);
+    const externalReference = `${giftId}|${intent.id}`;
 
     const response = await preference.create({
       body: {
@@ -104,13 +138,40 @@ module.exports = async function handler(req, res) {
         },
         notification_url: notificationUrl,
         auto_return: 'approved',
-        external_reference: giftId,
+        external_reference: externalReference,
         statement_descriptor: 'CASAMENTO LW',
       },
     });
 
+    if (process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const receiver =
+        process.env.GIFTS_RECEIVER_EMAIL ||
+        process.env.RSVP_RECEIVER_EMAIL ||
+        'willian.silvacosta@hotmail.com';
+
+      resend.emails
+        .send({
+          from: 'Lorena & Willian <onboarding@resend.dev>',
+          to: receiver,
+          subject: `Presente identificado - ${giverName}`,
+          replyTo: giverEmail,
+          text: [
+            'Novo presente identificado',
+            `Presente: ${gift.label}`,
+            `Gift ID: ${giftId}`,
+            `Intent ID: ${intent.id}`,
+            `Nome: ${giverName}`,
+            `Email: ${giverEmail}`,
+            `Bilhetinho: ${giftMessage}`,
+          ].join('\n'),
+        })
+        .catch(() => {});
+    }
+
     res.status(200).json({
       ok: true,
+      intentId: intent.id,
       preferenceId: response.id,
       checkoutUrl: response.init_point,
       sandboxCheckoutUrl: response.sandbox_init_point,

@@ -427,26 +427,93 @@ document.addEventListener('DOMContentLoaded', function() {
         const presentearHtml =
             'Presenteie com Pix,<br>Cartão de Crédito, ou<br>Linha de crédito (Melhor opção)';
 
+        const giftModal = document.getElementById('giftModal');
+        const giftForm = document.getElementById('giftForm');
+        const giftFormMessage = document.getElementById('giftFormMessage');
+        const giftIdField = document.getElementById('giftIdField');
+        const giftLabelField = document.getElementById('giftLabelField');
+        const giftSelectedName = document.getElementById('giftSelectedName');
+        const giftGiverName = document.getElementById('giftGiverName');
+        const giftGiverEmail = document.getElementById('giftGiverEmail');
+        const giftNote = document.getElementById('giftNote');
+
+        const openGiftModal = (giftId, giftLabel) => {
+            if (!giftModal || !giftForm) return;
+
+            giftForm.reset();
+            if (giftIdField) giftIdField.value = giftId || '';
+            if (giftLabelField) giftLabelField.value = giftLabel || '';
+            if (giftSelectedName) giftSelectedName.textContent = giftLabel || giftId || '';
+            if (giftFormMessage) giftFormMessage.style.display = 'none';
+
+            giftModal.classList.add('open');
+            giftModal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+
+            if (giftGiverName) giftGiverName.focus();
+        };
+
+        const closeGiftModal = () => {
+            if (!giftModal) return;
+            giftModal.classList.remove('open');
+            giftModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        };
+
+        if (giftModal) {
+            giftModal.querySelectorAll('[data-gift-close]').forEach(el => {
+                el.addEventListener('click', closeGiftModal);
+            });
+        }
+
+        const showGiftMessage = (message, type) => {
+            if (!giftFormMessage) return;
+            giftFormMessage.textContent = message;
+            giftFormMessage.className = `rsvp-message ${type}`;
+            giftFormMessage.style.display = 'block';
+        };
+
         presenteButtons.forEach(button => {
             if (!button.disabled) {
                 button.innerHTML = presentearHtml;
             }
 
-            button.addEventListener('click', async function() {
+            button.addEventListener('click', function() {
                 const giftId = this.getAttribute('data-presente');
                 const giftLabel = getGiftLabel(this, giftId);
 
                 if (!giftId) return;
+                openGiftModal(giftId, giftLabel);
+            });
+        });
 
-                const confirmar = confirm(
-                    `Voce sera redirecionado(a) ao Mercado Pago para pagar "${giftLabel}" com Pix ou cartao. Deseja continuar?`
-                );
+        if (giftForm) {
+            giftForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
 
-                if (!confirmar) return;
+                const giftId = giftIdField ? giftIdField.value.trim() : '';
+                const giftLabel = giftLabelField ? giftLabelField.value.trim() : '';
+                const giverName = giftGiverName ? giftGiverName.value.trim() : '';
+                const giverEmail = giftGiverEmail ? giftGiverEmail.value.trim() : '';
+                const giftMessage = giftNote ? giftNote.value.trim() : '';
 
-                const originalHtml = this.innerHTML;
-                this.disabled = true;
-                this.textContent = 'Gerando pagamento...';
+                if (!giftId || !giverName || !giverEmail || !giftMessage) {
+                    showGiftMessage('Por favor, preencha nome, e-mail e bilhetinho.', 'error');
+                    return;
+                }
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(giverEmail)) {
+                    showGiftMessage('Por favor, insira um e-mail valido.', 'error');
+                    return;
+                }
+
+                const submitButton = giftForm.querySelector('button[type=\"submit\"]');
+                const originalText = submitButton ? submitButton.textContent : '';
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Gerando pagamento...';
+                }
 
                 try {
                     const response = await fetch('/api/create-payment-preference', {
@@ -457,6 +524,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         body: JSON.stringify({
                             giftName: giftId,
                             giftLabel,
+                            giverName,
+                            giverEmail,
+                            giftMessage,
                             origin: window.location.origin,
                             siteUrl: window.location.origin
                         })
@@ -465,22 +535,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     const result = await response.json().catch(() => ({}));
 
                     if (!response.ok) {
-                        throw new Error(result.error || 'Nao foi possivel iniciar o pagamento.');
+                        showGiftMessage(result.error || 'Nao foi possivel iniciar o pagamento.', 'error');
+                        return;
                     }
 
                     const checkoutUrl = result.checkoutUrl || result.sandboxCheckoutUrl;
                     if (!checkoutUrl) {
-                        throw new Error('Link de pagamento indisponivel.');
+                        showGiftMessage('Link de pagamento indisponivel.', 'error');
+                        return;
                     }
 
                     window.location.href = checkoutUrl;
                 } catch (error) {
-                    alert(error.message || 'Erro ao iniciar pagamento. Tente novamente.');
-                    this.disabled = false;
-                    this.innerHTML = originalHtml;
+                    showGiftMessage('Erro ao iniciar pagamento. Tente novamente.', 'error');
+                } finally {
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalText;
+                    }
                 }
             });
-        });
+        }
 
         applyMassGiftImages();
         carregarPresentesPagos();

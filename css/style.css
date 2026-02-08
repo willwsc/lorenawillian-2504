@@ -1736,10 +1736,10 @@ nav ul li a:hover {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("../images/diagonalEmPe.jpeg");
+  background-image: url("../images/6.jpeg");
   background-color: #000;
-  background-size: 100% auto;
-  background-position: center 40%;
+  background-size: cover;
+  background-position: center 45%;
   background-repeat: no-repeat;
   opacity: 0.90; /* controla a opacidade do fundo */
   z-index: 0;

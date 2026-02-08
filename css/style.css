@@ -775,6 +775,21 @@ nav ul li a:hover {
     gap: 20px;
 }
 
+.galeria-video{
+    max-width: 900px;
+    margin: 20px auto 30px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.galeria-video-player{
+    width: 100%;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+
 .galeria-item {
     border-radius: 10px;
     overflow: hidden;
@@ -795,6 +810,11 @@ nav ul li a:hover {
 }
 
 @media (max-width: 768px){
+  .galeria-video{
+    margin: 14px auto 22px;
+    border-radius: 10px;
+  }
+
   .galeria-item img{
     height: 220px;
   }

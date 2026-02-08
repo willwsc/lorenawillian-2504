@@ -961,7 +961,7 @@ nav ul li a:hover {
 /* ===== PRESENTES com visual do Sobre Nós ===== */
 #presentes{
   position: relative;
-  background-image: url("../images/3collage.jpeg");
+  background-image: url("../images/3CollageEscada.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center 35%;
@@ -1768,7 +1768,7 @@ nav ul li a:hover {
 /* RSVP com visual semelhante ao Sobre Nos */
 #rsvp{
   position: relative;
-  background-image: url("../images/3collage.jpeg");
+  background-image: url("../images/3CollageCatedral.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center 35%;

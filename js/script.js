@@ -600,6 +600,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // ========== VIDEO GALERIA ==========
+    (function initGaleriaVideo() {
+    const wrapper = document.querySelector('.galeria-video');
+    const video = wrapper ? wrapper.querySelector('video') : null;
+    if (!wrapper || !video) return;
+
+    const updateState = () => {
+        wrapper.classList.toggle('is-playing', !video.paused && !video.ended);
+    };
+
+    video.addEventListener('play', updateState);
+    video.addEventListener('pause', updateState);
+    video.addEventListener('ended', updateState);
+    updateState();
+    })();
+
         // ========== CONTAGEM REGRESSIVA ==========
     (function countdown() {
     const d = document.getElementById('cdDays');

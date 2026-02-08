@@ -1355,6 +1355,19 @@ nav ul li a:hover {
   padding: 26px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.25);
 }
+
+/* Modal de presente: reduzir peso do formulario */
+#giftModal .rsvp-form{
+  margin: 12px 0 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+#giftModal .form-group{
+  margin-bottom: 16px;
+}
 .modal-close{
   position:absolute;
   right: 12px;
@@ -1405,6 +1418,34 @@ nav ul li a:hover {
     left: 18px;
     right: 18px;
     text-align:center;
+  }
+
+  .modal-content{
+    margin: 4vh auto;
+    padding: 16px;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #giftModal .form-group{
+    margin-bottom: 14px;
+  }
+
+  #giftModal .form-group label{
+    font-size: 0.95em;
+  }
+
+  #giftModal .form-group input,
+  #giftModal .form-group select,
+  #giftModal .form-group textarea{
+    font-size: 0.95em;
+    padding: 10px 12px;
+  }
+
+  #giftModal .btn-submit{
+    font-size: 1em;
+    padding: 12px;
   }
 }
 

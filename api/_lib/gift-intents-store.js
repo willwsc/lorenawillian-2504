@@ -21,6 +21,19 @@ async function createGiftIntent(payload) {
   return intent;
 }
 
+async function getGiftIntent(intentId) {
+  if (!intentId) return null;
+  const redis = await getRedisClient();
+  const raw = await redis.get(`${INTENT_PREFIX}${intentId}`);
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    return null;
+  }
+}
+
 async function markGiftIntentPaid(intentId, paymentId) {
   if (!intentId) return null;
   const redis = await getRedisClient();
@@ -35,17 +48,21 @@ async function markGiftIntentPaid(intentId, paymentId) {
     return null;
   }
 
-  intent.status = 'paid';
-  intent.paidAt = new Date().toISOString();
-  if (paymentId) {
+  const alreadyPaid = intent.status === 'paid';
+  if (!alreadyPaid) {
+    intent.status = 'paid';
+    intent.paidAt = new Date().toISOString();
+  }
+  if (paymentId && !intent.paymentId) {
     intent.paymentId = String(paymentId);
   }
 
   await redis.set(key, JSON.stringify(intent));
-  return intent;
+  return { intent, alreadyPaid };
 }
 
 module.exports = {
   createGiftIntent,
+  getGiftIntent,
   markGiftIntentPaid,
 };

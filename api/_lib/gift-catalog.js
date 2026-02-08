@@ -23,6 +23,9 @@
   gift_23: { label: 'Jogo de cama premium', amount: 900 },
   gift_24: { label: 'Autocuidado da noiva', amount: 380 },
   gift_25: { label: 'Raspar o cabelo do noivo', amount: 5000 },
+  gift_26: { label: 'Presente teste 1', amount: 1 },
+  gift_27: { label: 'Presente teste 2', amount: 1 },
+  gift_28: { label: 'Presente teste 3', amount: 1 },
 };
 
 module.exports = {

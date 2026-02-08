@@ -1,4 +1,5 @@
 ﻿const { MercadoPagoConfig, Payment } = require('mercadopago');
+const { Resend } = require('resend');
 const { isValidGiftName } = require('./_lib/gift-catalog');
 const { markGiftAsPaid } = require('./_lib/gifts-store');
 const { markGiftIntentPaid } = require('./_lib/gift-intents-store');
@@ -54,11 +55,44 @@ module.exports = async function handler(req, res) {
     }
 
     await markGiftAsPaid(giftName);
-    await markGiftIntentPaid(intentId, paymentId);
+    const intentResult = await markGiftIntentPaid(intentId, paymentId);
+
+    if (process.env.RESEND_API_KEY && intentResult?.intent && !intentResult.alreadyPaid) {
+      const intent = intentResult.intent;
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      try {
+        await resend.emails.send({
+          from: 'Lorena & Willian <onboarding@resend.dev>',
+          to: 'willian.silvacosta@hotmail.com',
+          subject: `Pagamento confirmado - ${intent.giverName || 'Presente'}`,
+          replyTo: intent.giverEmail || undefined,
+          text: [
+            'Pagamento confirmado no Mercado Pago',
+            `Presente: ${intent.giftLabel || giftName}`,
+            `Gift ID: ${giftName}`,
+            `Intent ID: ${intent.id}`,
+            `Pagamento ID: ${String(paymentId)}`,
+            `Status: ${payment?.status || 'approved'}`,
+            `Nome: ${intent.giverName || '-'}`,
+            `Email: ${intent.giverEmail || '-'}`,
+            `Bilhetinho: ${intent.giftMessage || '-'}`,
+          ].join('\n'),
+        });
+      } catch (error) {
+        console.error('Falha ao enviar email de pagamento confirmado:', error.message || error);
+      }
+    }
 
     res.status(200).json({ ok: true, giftName, paymentId: String(paymentId), intentId: intentId || null });
   } catch (error) {
     res.status(500).json({ ok: false, error: 'Falha ao processar webhook do Mercado Pago.' });
   }
 };
+
+
+
+
+
+
+
 

@@ -215,6 +215,7 @@ nav ul li a:hover {
 @media (max-width: 768px) {
   .hero-bg {
     inset: -200px;
+    background-position: 0% var(--hero-y);
   }
   .hero-bg-center {
     clip-path: inset(0 0.5% 0 0.5%);
@@ -226,7 +227,7 @@ nav ul li a:hover {
   .hero-bg-left,
   .hero-bg-right,
   .hero-bg-center{
-    background-position: left var(--hero-y);
+    background-position: 0% var(--hero-y) !important;
   }
   .hero-bg-center{
     clip-path: inset(0 0 0 0);

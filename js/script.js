@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const presentearHtml =
-            'Presenteie com Pix,<br>Cartão de Crédito, ou<br>Linha de crédito (Melhor opção)';
+            'Presenteie com Pix,<br>Cartão de Crédito, ou<br>Linha de crédito';
 
         const giftModal = document.getElementById('giftModal');
         const giftForm = document.getElementById('giftForm');

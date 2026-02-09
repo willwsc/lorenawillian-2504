@@ -214,23 +214,17 @@ nav ul li a:hover {
 /* Mobile: borda ainda mais fininha e cobre melhor topo/baixo */
 @media (max-width: 768px) {
   .hero-bg {
-    inset: -200px;
+    inset: 0;
     background-position: 0% var(--hero-y);
-  }
-  .hero-bg-center {
-    clip-path: inset(0 0.5% 0 0.5%);
   }
   .hero-bg-left,
   .hero-bg-right {
-    transform: scale(1.32);
-  }
-  .hero-bg-left,
-  .hero-bg-right,
-  .hero-bg-center{
-    background-position: 0% var(--hero-y) !important;
+    display: none;
   }
   .hero-bg-center{
     clip-path: inset(0 0 0 0);
+    background-position: 0% var(--hero-y) !important;
+    background-size: cover;
   }
 }
 

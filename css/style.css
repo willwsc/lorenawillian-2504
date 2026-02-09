@@ -223,13 +223,13 @@ nav ul li a:hover {
   .hero-bg-right {
     transform: scale(1.32);
   }
-  :root{
-    --hero-x: 0%;
-  }
   .hero-bg-left,
   .hero-bg-right,
   .hero-bg-center{
     background-position: left var(--hero-y);
+  }
+  .hero-bg-center{
+    clip-path: inset(0 0 0 0);
   }
 }
 

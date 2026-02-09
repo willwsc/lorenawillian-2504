@@ -17,7 +17,7 @@
     --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --shadow-hover: 0 5px 20px rgba(0, 0, 0, 0.15);
     --transition: all 0.3s ease;
-    --hero-x: 15%;
+    --hero-x: 0%;
     --hero-y: 31%;
 }
 
@@ -962,6 +962,10 @@ nav ul li a:hover {
 /* ===== PRESENTES com visual do Sobre Nós ===== */
 #presentes{
   position: relative;
+  background-image: url("../images/3CollageEscada.jpeg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center 35%;
   background-color: #000;
   overflow: hidden;
 }
@@ -970,12 +974,7 @@ nav ul li a:hover {
   content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(0,0,0,0.78), rgba(0,0,0,0.78)),
-    url("../images/3CollageEscada.jpeg");
-  background-size: cover;
-  background-position: center 35%;
-  background-repeat: no-repeat;
+  background: rgba(0,0,0,0.78);
   z-index: 0;
 }
 
@@ -1205,15 +1204,15 @@ nav ul li a:hover {
     background-color: var(--text-dark);
     color: white;
     text-align: center;
-    padding: 40px 20px;
+    padding: 18px 20px;
 }
 
 .footer p {
-    margin: 10px 0;
+    margin: 6px 0;
 }
 
 .footer-love {
-    margin-top: 20px;
+    margin-top: 8px;
     font-style: italic;
     color: var(--accent-color);
 }

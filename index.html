@@ -59,6 +59,36 @@
         <div class="hero-overlay"></div>
     </section>
 
+    <!-- Modal Presente -->
+    <div id="giftModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="giftModalTitle">
+        <div class="modal-overlay" data-gift-close></div>
+        <div class="modal-content">
+            <button class="modal-close" type="button" data-gift-close aria-label="Fechar">×</button>
+            <h3 id="giftModalTitle">Identifique seu presente</h3>
+            <p class="modal-text">Para continuar com o pagamento, informe seus dados e um bilhetinho.</p>
+            <p class="modal-text"><strong>Presente selecionado:</strong> <span id="giftSelectedName"></span></p>
+
+            <form id="giftForm" class="rsvp-form">
+                <input type="hidden" id="giftIdField" name="giftId">
+                <input type="hidden" id="giftLabelField" name="giftLabel">
+                <div class="form-group">
+                    <label for="giftGiverName">Seu nome completo:</label>
+                    <input type="text" id="giftGiverName" name="giverName" required placeholder="Digite seu nome completo">
+                </div>
+                <div class="form-group">
+                    <label for="giftGiverEmail">Seu e-mail:</label>
+                    <input type="email" id="giftGiverEmail" name="giverEmail" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="giftNote">Bilhetinho do presente:</label>
+                    <textarea id="giftNote" name="giftMessage" rows="4" required placeholder="Deixe um bilhetinho para os noivos..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Continuar para pagamento</button>
+            </form>
+            <div id="giftFormMessage" class="rsvp-message"></div>
+        </div>
+    </div>
+
     <!-- Seção Sobre Nós -->
     <section id="sobre" class="section">
         <div class="container">
@@ -169,7 +199,7 @@
         <p class="section-subtitle">Alguns registros especiais da nossa história</p>
 
         <div class="galeria-video">
-            <video class="galeria-video-player" controls playsinline preload="metadata" poster="images/LWbeijo">
+            <video class="galeria-video-player" controls playsinline preload="metadata" poster="images/LWbeijo.jpeg">
                 <source src="images/teaserPreWedding.mp4" type="video/mp4">
                 Seu navegador não suporta a reprodução de vídeo.
             </video>

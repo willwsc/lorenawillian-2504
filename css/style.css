@@ -1221,6 +1221,11 @@ nav ul li a:hover {
     color: var(--accent-color);
 }
 
+.footer-emojis {
+    display: inline-block;
+    filter: grayscale(100%) brightness(0.75);
+}
+
 /* Responsividade */
 @media screen and (max-width: 968px) {
     .hero-title {

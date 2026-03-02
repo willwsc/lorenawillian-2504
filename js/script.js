@@ -424,8 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
             window.history.replaceState({}, document.title, cleanUrl);
         }
 
-        const presentearHtml =
-            'Presenteie com Pix,<br>Cartão de Crédito, ou<br>Linha de crédito';
+        const presentearHtml = 'Presentear os noivos';
 
         const giftModal = document.getElementById('giftModal');
         const giftForm = document.getElementById('giftForm');

@@ -1187,8 +1187,19 @@ nav ul li a:hover {
 #presentes .btn-presente{
   width: calc(100% - 28px);
   margin: 10px 14px 14px;
-  padding: 9px;
-  font-size: 0.9em;
+  padding: 12px 16px;
+  min-height: 44px;
+  font-size: 0.95em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+}
+
+#presentes .btn-presente:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0,0,0,0.22);
 }
 
 #presentes .confirmacao{

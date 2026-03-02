@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
             window.history.replaceState({}, document.title, cleanUrl);
         }
 
-        const presentearHtml = 'Presentear os noivos';
+        const presentearHtml = 'Presentear os Noivos';
 
         const giftModal = document.getElementById('giftModal');
         const giftForm = document.getElementById('giftForm');
